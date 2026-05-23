@@ -6,16 +6,18 @@
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { MatchProvider } from "./context/MatchContext";
 import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
-import { Sparkles, Home as HomeIcon, Trophy, RotateCw, BarChart3 } from "lucide-react";
+import { Sparkles, Home as HomeIcon, Trophy, RotateCw, Download } from "lucide-react";
 import ThemeToggle from "./components/ThemeToggle";
 import Home from "./pages/Home";
 import SetupRotation from "./pages/SetupRotation";
 import Match from "./pages/Match";
 import HistoriqueGbolo from "./pages/HistoriqueGbolo";
+import { usePWAInstall } from "./hooks/usePWAInstall";
 
 function Shell() {
   const { theme } = useTheme();
   const location = useLocation();
+  const { canInstall, install } = usePWAInstall();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -81,8 +83,22 @@ function Shell() {
             </Link>
           </nav>
 
-          {/* Action toggle placeholder */}
+          {/* Action toggle */}
           <div className="flex items-center gap-2">
+            {canInstall && (
+              <button
+                onClick={install}
+                className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold font-display rounded-lg border transition-all ${
+                  theme === "dark"
+                    ? "bg-amber-500/15 text-amber-400 border-amber-500/30 hover:bg-amber-500/25"
+                    : "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
+                }`}
+                title="Installer l'application"
+              >
+                <Download className="h-3.5 w-3.5" />
+                Installer
+              </button>
+            )}
             <ThemeToggle />
           </div>
         </div>
@@ -138,6 +154,16 @@ function Shell() {
           <Trophy className="h-5 w-5" />
           <span className="text-[10px] font-bold font-display uppercase tracking-wider">Match</span>
         </Link>
+        {canInstall && (
+          <button
+            onClick={install}
+            className="flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all text-amber-500"
+            title="Installer l'application"
+          >
+            <Download className="h-5 w-5" />
+            <span className="text-[10px] font-bold font-display uppercase tracking-wider">Installer</span>
+          </button>
+        )}
       </div>
 
       {/* Universal Footer */}
