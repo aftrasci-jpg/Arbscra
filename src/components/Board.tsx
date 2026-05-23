@@ -7,6 +7,7 @@ interface BoardProps {
   selectedCoords?: string;
   previewScore?: number | null;
   previewWord?: string;
+  boardSize?: number;
 }
 
 // Scrabble multiplier types
@@ -65,7 +66,8 @@ export default function Board({
   onCellClick, 
   selectedCoords,
   previewScore,
-  previewWord 
+  previewWord,
+  boardSize
 }: BoardProps) {
   const { theme } = useTheme();
 
@@ -114,20 +116,17 @@ export default function Board({
   };
 
   return (
-    <div className="flex flex-col items-center select-none w-full">
-      {/* Wrapper to handle scaling and borders without breaking layout */}
+    <div className="flex flex-col items-center select-none w-full p-0">
       <div className="w-full flex justify-center">
-        <div className={`p-1.5 sm:p-3 rounded-2xl border flex flex-col items-center w-full max-w-[500px] ${
-          theme === "dark" ? "bg-slate-900/60 border-slate-800/80" : "bg-white border-slate-200 shadow-sm"
-        }`}>
+        <div className="flex flex-col items-center w-full max-w-full">
           
           {/* Top Header Labels (A-O) aligned dynamically */}
           <div className="flex w-full mb-0.5">
-            <div className="w-5 sm:w-6 shrink-0 flex items-center justify-center" /> {/* top-left corner spacer */}
+            <div className="w-4 sm:w-5 shrink-0 flex items-center justify-center" /> {/* top-left corner spacer */}
             {cols.map((col) => (
               <div 
                 key={col} 
-                className="flex-1 text-center font-mono text-[8px] sm:text-[10px] uppercase font-bold text-slate-500 flex items-center justify-center aspect-square"
+                className="flex-1 text-center font-mono text-[8px] sm:text-[9.5px] uppercase font-semibold text-slate-500 flex items-center justify-center aspect-square"
               >
                 {col}
               </div>
@@ -140,7 +139,7 @@ export default function Board({
               <div key={rIdx} className="flex gap-[1px] sm:gap-0.5 w-full items-center">
                 
                 {/* Left Side Labels (1-15) */}
-                <div className="w-5 sm:w-6 shrink-0 font-mono text-[8px] sm:text-[10px] font-bold text-slate-500 text-right pr-1 sm:pr-1.5 aspect-square flex items-center justify-end">
+                <div className="w-4 sm:w-5 shrink-0 font-mono text-[8px] sm:text-[9.5px] font-semibold text-slate-505 text-right pr-1 sm:pr-1.5 aspect-square flex items-center justify-end">
                   {rows[rIdx]}
                 </div>
 

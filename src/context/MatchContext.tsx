@@ -49,6 +49,8 @@ interface MatchContextType {
     players: Array<{ name: string; score: number }>;
     winnerName: string;
     timestamp: string;
+    createdAt?: string;
+    history?: MatchHistoryEntry[];
     kingStreak: number;
     isDraw?: boolean;
   }>;
@@ -295,6 +297,8 @@ export function MatchProvider({ children }: { children: React.ReactNode }) {
         players: players.map(p => ({ name: p.name, score: p.score })),
         winnerName: "Match Nul",
         timestamp: new Date().toLocaleString("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
+        createdAt: new Date().toISOString(),
+        history: [...history],
         kingStreak: 0,
         isDraw: true
       };
@@ -347,6 +351,8 @@ export function MatchProvider({ children }: { children: React.ReactNode }) {
       players: players.map(p => ({ name: p.name, score: p.score })),
       winnerName,
       timestamp: new Date().toLocaleString("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }),
+      createdAt: new Date().toISOString(),
+      history: [...history],
       kingStreak: nextStreak,
       isDraw: false
     };

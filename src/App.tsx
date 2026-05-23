@@ -83,6 +83,7 @@ function Shell() {
 
           {/* Action toggle placeholder */}
           <div className="flex items-center gap-2">
+            <ThemeToggle />
           </div>
         </div>
       </header>

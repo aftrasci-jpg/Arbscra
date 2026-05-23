@@ -655,7 +655,7 @@ export default function Match() {
         renderPairingSetup()
       ) : (
         /* Active playing screen layout - optimized and perfectly centered */
-        <div className="flex flex-col gap-6 w-full max-w-3xl mx-auto items-stretch" id="active-play-root">
+        <div className="flex flex-col gap-4 w-full max-w-3xl mx-auto items-stretch" id="active-play-root">
           
           {/* Top: ScoreBoard */}
           <div className="w-full">
@@ -663,106 +663,99 @@ export default function Match() {
           </div>
 
           {/* Middle: Centered 15x15 Interactive digital Board */}
-          <div className="flex flex-col items-center justify-center w-full">
-            <div className={`p-2.5 sm:p-5 rounded-2xl border w-full max-w-[500px] ${
-              theme === "dark" ? "bg-slate-900/60 border-slate-800" : "bg-white border-slate-200 shadow-sm"
-            }`}>
-              <div className="flex items-center justify-between mb-3 sm:mb-4 px-1">
-                <div className="flex items-center gap-2">
-                  <LayoutGrid className="h-4.5 w-4.5 text-amber-500" />
-                  <h3 className="font-semibold font-display text-xs sm:text-sm">Plateau Scrabble Digital</h3>
-                </div>
-                <span className="text-[9px] sm:text-[10px] font-mono text-slate-400">
-                  Sélectionnez une case
-                </span>
-              </div>
+          <div className="flex flex-col items-center justify-center w-full px-1 sm:px-2 gap-2" id="board-container-wrapper">
+            
+            {/* Extremely compact title */}
+            <div className="flex items-center gap-1.5 px-0.5 justify-center mt-1">
+              <LayoutGrid className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+              <h3 className="font-bold font-display text-[10px] sm:text-xs uppercase tracking-wider text-slate-500">Plateau Scrabble Digital</h3>
+            </div>
 
-              {(() => {
-                const previewBoard = board.map(row => [...row]);
-                const cleanWord = word.trim().toUpperCase();
-                const cleanCoords = coords.trim().toUpperCase();
-                let finalPreviewScore: number | null = null;
-                if (cleanWord && cleanCoords && cleanCoords.length >= 2) {
-                  const match = cleanCoords.match(/^([A-O])([0-9]{1,2})$/);
-                  if (match) {
-                    const colLetter = match[1];
-                    const rowNum = parseInt(match[2]);
-                    let col = colLetter.charCodeAt(0) - 65;
-                    let row = rowNum - 1;
-                    
-                    for (let i = 0; i < cleanWord.length; i++) {
-                      if (row >= 0 && row < 15 && col >= 0 && col < 15) {
-                        if (!previewBoard[row][col]) {
-                          previewBoard[row][col] = `preview:${cleanWord[i]}`;
-                        }
-                      }
-                      if (direction === "H") {
-                        col++;
-                      } else {
-                        row++;
+            {(() => {
+              const previewBoard = board.map(row => [...row]);
+              const cleanWord = word.trim().toUpperCase();
+              const cleanCoords = coords.trim().toUpperCase();
+              let finalPreviewScore: number | null = null;
+              if (cleanWord && cleanCoords && cleanCoords.length >= 2) {
+                const match = cleanCoords.match(/^([A-O])([0-9]{1,2})$/);
+                if (match) {
+                  const colLetter = match[1];
+                  const rowNum = parseInt(match[2]);
+                  let col = colLetter.charCodeAt(0) - 65;
+                  let row = rowNum - 1;
+                  
+                  for (let i = 0; i < cleanWord.length; i++) {
+                    if (row >= 0 && row < 15 && col >= 0 && col < 15) {
+                      if (!previewBoard[row][col]) {
+                        previewBoard[row][col] = `preview:${cleanWord[i]}`;
                       }
                     }
+                    if (direction === "H") {
+                      col++;
+                    } else {
+                      row++;
+                    }
+                  }
 
-                    try {
-                      const fullCoords = `${cleanCoords}${direction}`;
-                      const result = calculateScore(cleanWord, fullCoords, board);
-                      if (result && result.total > 0) {
-                        finalPreviewScore = result.total + adjustment;
-                      } else if (adjustment !== 0) {
-                        finalPreviewScore = adjustment;
-                      }
-                    } catch (e) {
-                      if (adjustment !== 0) {
-                        finalPreviewScore = adjustment;
-                      }
+                  try {
+                    const fullCoords = `${cleanCoords}${direction}`;
+                    const result = calculateScore(cleanWord, fullCoords, board);
+                    if (result && result.total > 0) {
+                      finalPreviewScore = result.total + adjustment;
+                    } else if (adjustment !== 0) {
+                      finalPreviewScore = adjustment;
+                    }
+                  } catch (e) {
+                    if (adjustment !== 0) {
+                      finalPreviewScore = adjustment;
                     }
                   }
                 }
-                return (
-                  <div className="space-y-4">
-                    <Board 
-                      board={previewBoard} 
-                      onCellClick={handleCellClick} 
-                      selectedCoords={coords} 
-                      previewScore={finalPreviewScore}
-                      previewWord={cleanWord}
-                    />
+              }
+              return (
+                <div className="space-y-4 w-full">
+                  <Board 
+                    board={previewBoard} 
+                    onCellClick={handleCellClick} 
+                    selectedCoords={coords} 
+                    previewScore={finalPreviewScore}
+                    previewWord={cleanWord}
+                  />
 
-                    {/* Champ de saisie mot et bouton de validation juste en dessous du plateau */}
-                    <form onSubmit={handleSubmitWord} className="pt-3 border-t border-slate-500/10 space-y-1.5 text-left">
-                      <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400 block px-1">
-                        Mot :
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={word}
-                          onChange={(e) => setWord(e.target.value.replace(/[^a-zA-Z*]/g, "").toUpperCase())}
-                          placeholder="Saisir le mot..."
-                          className={`flex-1 p-2.5 rounded-xl border text-sm focus:outline-none focus:ring-1.5 focus:ring-amber-500/40 font-display tracking-wide uppercase font-semibold text-center ${
-                            theme === "dark"
-                              ? "bg-slate-950 border-slate-850 text-white placeholder-slate-700"
-                              : "bg-slate-105 border-slate-200 text-slate-950 placeholder-slate-400"
-                          }`}
-                          required
-                        />
-                        <button
-                          type="submit"
-                          disabled={!word.trim() || !coords.trim()}
-                          className={`py-2.5 px-6 font-bold font-display text-xs tracking-wider rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1.5 uppercase shrink-0 ${
-                            word.trim() && coords.trim()
-                              ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/15 hover:scale-[1.01]"
-                              : "bg-slate-300 dark:bg-slate-850 text-slate-500 dark:text-slate-600 cursor-not-allowed opacity-50"
-                          }`}
-                        >
-                          VALIDER ⚡
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                );
-              })()}
-            </div>
+                  {/* Champ de saisie mot et bouton de validation juste en dessous du plateau */}
+                  <form onSubmit={handleSubmitWord} className="pt-3 border-t border-slate-500/10 space-y-1.5 text-left">
+                    <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-400 block px-1">
+                      Mot :
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={word}
+                        onChange={(e) => setWord(e.target.value.replace(/[^a-zA-Z*]/g, "").toUpperCase())}
+                        placeholder="Saisir le mot..."
+                        className={`flex-1 p-2.5 rounded-xl border text-sm focus:outline-none focus:ring-1.5 focus:ring-amber-500/40 font-display tracking-wide uppercase font-semibold text-center ${
+                          theme === "dark"
+                            ? "bg-slate-950 border-slate-850 text-white placeholder-slate-700"
+                            : "bg-slate-105 border-slate-200 text-slate-950 placeholder-slate-400"
+                        }`}
+                        required
+                      />
+                      <button
+                        type="submit"
+                        disabled={!word.trim() || !coords.trim()}
+                        className={`py-2.5 px-6 font-bold font-display text-xs tracking-wider rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1.5 uppercase shrink-0 ${
+                          word.trim() && coords.trim()
+                            ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md shadow-emerald-500/15 hover:scale-[1.01]"
+                            : "bg-slate-300 dark:bg-slate-850 text-slate-500 dark:text-slate-600 cursor-not-allowed opacity-50"
+                        }`}
+                      >
+                        VALIDER ⚡
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              );
+            })()}
           </div>
  
           {/* Section: Passer le tour button positioned exactly between Board & MoveForm */}
